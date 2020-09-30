@@ -1,6 +1,10 @@
-module Core
-    ( mainFunc
-    ) where
+module Core ( 
+  mainFunc
+) where
+
+import System.Environment
+
+import Lexer
 
 mainFunc :: IO ()
-mainFunc = putStrLn "someFunc"
+mainFunc = getArgs >>= putStrLn . readExpr . head
