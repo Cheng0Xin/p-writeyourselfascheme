@@ -3,7 +3,7 @@ module Lexer (
   readExpr
 ) where
 
-import Text.ParserCombinators.Parsec
+import Text.ParserCombinators.Parsec hiding (spaces)
 
 
 data LispVal = Atom String
@@ -14,10 +14,13 @@ data LispVal = Atom String
   | Bool Bool
   deriving (Show)
 
+spaces :: Parser Char
+spaces = space <|> oneOf "\t\n\r\\"
+
 readExpr :: String -> String
-readExpr x = case parse parseExpr "" x of 
+readExpr x = case parse (skipMany spaces >> parseExpr) "Lisp > " x of 
   Right x -> show x
-  _ -> "Not found"
+  Left err -> "Not found, " ++ show err
 
 parseExpr :: Parser LispVal
 parseExpr = parseAtom
@@ -37,10 +40,14 @@ parseAtom = do
     "#f" -> Bool False
     _ -> Atom atom
 
+escapedChars :: Parser Char
+escapedChars = char '\\' >> oneOf "\\\""
+  
+
 parseString :: Parser LispVal
 parseString = do
   char '"'
-  x <- many $ noneOf "\""
+  x <- many $ noneOf "\"\\" <|> escapedChars
   char '"'
   return $ String x
 

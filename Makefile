@@ -1,6 +1,6 @@
 all:
 	stack build
-	stack exec writeyourselfascheme-exe 3 2
+	stack exec writeyourselfascheme-exe "\"test\""
 
 build: src/Lexer.hs
 	stack build
